@@ -19,6 +19,7 @@ def sentry_log_error(message=None, title=frappe._("Error")):
 		from sentry.sentry.utils import capture_exception
 		capture_exception(message, title)
 	except Exception as e:
+		print("error capturing exception", e)
 		pass
 
 	if message:

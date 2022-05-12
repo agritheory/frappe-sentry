@@ -1,24 +1,30 @@
-import * as Sentry from '@sentry/browser';
+import * as Sentry from '@sentry/browser'
+import { CaptureConsole, Offline } from '@sentry/integrations'
 
 frappe.ready(function () {
-	if (!window.sentry_dsn) {
+	if (!window.localStorage.getItem('sentry.dsn')) {
 		frappe.call({
-			method: "sentry.utils.get_sentry_dsn",
+			method: "sentry.sentry.utils.get_sentry_details",
 			callback: function (r) {
 				if (r.message) {
-					window.localStorage.sentry_dsn = r.message;
+					window.localStorage.setItem('sentry.dsn', r.message.dsn)
 				}
 			}
-		});
+		})
 	}
 
-	if (window.localStorage.sentry_dsn) {
-		Sentry.init({ dsn: window.localStorage.sentry_dsn });
-
+	if (window.localStorage.getItem('sentry.dsn')) {
+		Sentry.init({
+			dsn: window.localStorage.getItem('sentry.dsn'),
+			integrations: [
+				new CaptureConsole({ levels: ['warn', 'error', 'debug'] }),
+				new Offline({ maxStoredEvents: 25 })
+			],
+		})
 		if (frappe.sid != "Guest") {
-			Sentry.configureScope(function (scope) {
-				scope.setUser({ email: frappe.user_id });
-			});
+			Sentry.configureScope( scope => {
+				scope.setUser({ email: frappe.session.user })
+			})
 		}
 	}
 })

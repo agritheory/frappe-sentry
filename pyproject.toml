@@ -1,5 +1,5 @@
 [project]
-name = "aterp"
+name = "sentry"
 authors = [
     { name = "AgriTheory", email = "support@agritheory.dev"}
 ]

@@ -1,5 +1,5 @@
 {
-	"name": "@agritheory/frappe-sentry",
+	"name": "@agritheory/frappe-ssentry",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/agritheory/frappe-sentry.git"

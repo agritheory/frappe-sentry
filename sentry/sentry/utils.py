@@ -2,18 +2,22 @@ import frappe
 import sentry_sdk
 from sentry_sdk.integrations.rq import RqIntegration
 
+
 @frappe.whitelist(allow_guest=True)
 def get_sentry_details():
 	if sentry_enabled():
-		return frappe._dict({
-			"dsn": frappe.conf.get("sentry_dsn"),
-			"site": frappe.conf.get('sentry_site', frappe.local.site),
-			"project": frappe.conf.get('sentry_project', frappe.local.site),
-			"server_name": frappe.conf.get('sentry_server_name', frappe.local.site),
-		})
+		return frappe._dict(
+			{
+				"dsn": frappe.conf.get("sentry_dsn"),
+				"site": frappe.conf.get("sentry_site", frappe.local.site),
+				"project": frappe.conf.get("sentry_project", frappe.local.site),
+				"server_name": frappe.conf.get("sentry_server_name", frappe.local.site),
+			}
+		)
+
 
 def init_sentry():
-	sentry_dsn = get_sentry_details().get('dsn')
+	sentry_dsn = get_sentry_details().get("dsn")
 	if not sentry_dsn:
 		return
 
@@ -25,9 +29,9 @@ def capture_exception(message=None, title=None):
 	init_sentry()
 	with sentry_sdk.configure_scope() as scope:
 		scope.user = {"email": frappe.session.user}
-		scope.set_tag("site", frappe.conf.get('sentry_site', frappe.local.site))
-		scope.set_tag("project", frappe.conf.get('sentry_project', frappe.local.site))
-		scope.set_tag("server_name", frappe.conf.get('sentry_server_name', frappe.local.site))
+		scope.set_tag("site", frappe.conf.get("sentry_site", frappe.local.site))
+		scope.set_tag("project", frappe.conf.get("sentry_project", frappe.local.site))
+		scope.set_tag("server_name", frappe.conf.get("sentry_server_name", frappe.local.site))
 	sentry_sdk.capture_exception()
 
 

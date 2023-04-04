@@ -1,25 +1,25 @@
 {
-  "name": "sentry",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/agritheory/frappe-sentry.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/agritheory/frappe-sentry/issues"
-  },
-  "dependencies": {
-    "@sentry/browser": "^6.19.7",
-    "@sentry/integrations": "^6.19.7",
-    "@sentry/tracing": "^6.19.7"
-  },
-  "publishConfig": {
-    "access": "restricted"
-  },
-  "release": {
-    "branches": [
-      "version-13",
-      "version-14"
-    ]
-  }
+	"name": "sentry",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/agritheory/frappe-sentry.git"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/agritheory/frappe-sentry/issues"
+	},
+	"dependencies": {
+		"@sentry/browser": "^6.19.7",
+		"@sentry/integrations": "^6.19.7",
+		"@sentry/tracing": "^6.19.7"
+	},
+	"publishConfig": {
+		"access": "restricted"
+	},
+	"release": {
+		"branches": [
+			"version-13",
+			"version-14"
+		]
+	}
 }

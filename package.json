@@ -1,5 +1,5 @@
 {
-	"name": "sentry",
+	"name": "@agritheory/frappe-sentry",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/agritheory/frappe-sentry.git"
@@ -16,6 +16,7 @@
 	"publishConfig": {
 		"access": "restricted"
 	},
+	"private": true,
 	"release": {
 		"branches": [
 			"version-13",

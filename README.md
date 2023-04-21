@@ -1,6 +1,6 @@
 ## Sentry
 
-Sends errors and performance data to Sentry. Compatible with Frappe / ERPNext v12 and v13 (Use `master-v13` branch for v13)
+Sends errors and performance data to Sentry. Compatible with Frappe / ERPNext v13 and v14
 
 ## Features
 

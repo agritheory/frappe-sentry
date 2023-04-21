@@ -1,62 +1,49 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-__version__ = '0.1.0'
+__version__ = "14.0.0"
 
 import frappe
 import frappe.utils.background_jobs
-from frappe.utils.background_jobs import (
-	setup_loghandlers,
-	get_redis_conn,
-	get_queue_list,
-	Worker,
-	get_worker_name
-)
+from frappe import log_error as frappe_log_error
+from frappe.app import handle_exception as frappe_handle_exception
+from frappe.utils.background_jobs import start_worker as frappe_start_worker
 
-def sentry_log_error(message=None, title=frappe._("Error")):
+
+def sentry_log_error(title=None, message=None):
 	"""Log error to Frappe Error Log and forward to Sentry"""
+	from sentry.sentry.utils import capture_exception
+
 	try:
-		from sentry.sentry.utils import capture_exception
-		capture_exception(message, title)
+		capture_exception(title, message)
 	except Exception as e:
 		print("error capturing exception", e)
-		pass
+	finally:
+		frappe_log_error(title, message)
 
-	if message:
-		if "\n" in title:
-			error, title = title, message
-		else:
-			error = message
-	else:
-		error = frappe.get_traceback()
 
-	return frappe.get_doc(dict(
-		doctype="Error Log",
-		error=frappe.as_unicode(error),
-		method=title)
-	).insert(ignore_permissions=True)
-
-def start_worker_with_sentry_logging(queue=None, quiet=False):
+def start_worker_with_sentry_logging(queue=None, quiet=False, rq_username=None, rq_password=None):
 	"""Wrapper to start rq worker. Connects to redis and monitors these queues. Includes a Sentry integration"""
+	from sentry.sentry.utils import init_sentry
+
 	try:
-		from sentry.sentry.utils import init_sentry
 		init_sentry()
 	except Exception as e:
-		pass
-	with frappe.init_site():
-		# empty init is required to get redis_queue from common_site_config.json
-		redis_connection = get_redis_conn()
+		print("error starting worker", e)
+	finally:
+		frappe_start_worker(queue, quiet, rq_username, rq_password)
 
-	if os.environ.get("CI"):
-		setup_loghandlers("ERROR")
 
-	with Connection(redis_connection):
-		queues = get_queue_list(queue)
-		logging_level = "INFO"
-		if quiet:
-			logging_level = "WARNING"
-		Worker(queues, name=get_worker_name(queue)).work(logging_level=logging_level)
+def sentry_handle_exception(e):
+	from sentry.sentry.utils import capture_exception
+
+	http_status_code = getattr(e, "http_status_code", 500)
+	if http_status_code >= 500:
+		try:
+			capture_exception()
+		except Exception as exc:
+			print("error capturing exception", exc)
+
+	return frappe_handle_exception(e)
 
 
 frappe.log_error = sentry_log_error
+frappe.app.handle_exception = sentry_handle_exception
 frappe.utils.background_jobs.start_worker = start_worker_with_sentry_logging
